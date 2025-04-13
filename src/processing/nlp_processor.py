@@ -23,6 +23,13 @@ IMPORTANT_KEYWORDS = [
     "spin-off",
     "IPO",
     "delisting",
+    "lawsuit",
+    "probe",
+    "investigation",
+    "deal",
+    "partnership",
+    "earnings",
+    "IPO"
 ]
 
 def detect_events_in_text(text):

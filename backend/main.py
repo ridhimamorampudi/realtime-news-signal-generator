@@ -4,7 +4,9 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 
 
+
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fetchers.nyt_fetcher import fetch_nyt_finance_articles
 from fetchers.yahoo_fetcher import fetch_yahoo_finance_articles
 from fetchers.sec_fetcher import fetch_sec_8k_filings
@@ -13,6 +15,14 @@ from processing.nlp_processor import detect_events_in_text
 from signals.signal_generator import is_market_moving
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # allow frontend origin
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.get("/")
 async def root():
