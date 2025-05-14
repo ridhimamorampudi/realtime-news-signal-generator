@@ -1,11 +1,38 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import useAuthRedirect from "@/hooks/useAuthRedirect";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "@/firebase";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+
 
 export default function Home() {
+  useAuthRedirect();
   const [signals, setSignals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState("");
+  const router = useRouter();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      if (u) setUser(u);
+    });
+    return () => unsubscribe();
+  }, []);
+
+const handleLogout = async () => {
+  try {
+    await signOut(auth);
+    toast.success("Logged out successfully");
+    router.push("/login");
+  } catch (error) {
+    toast.error("Failed to logout");
+  }
+};
+
 
   async function fetchSignals() {
     try {
@@ -49,12 +76,12 @@ export default function Home() {
             <p className="text-slate-500 mt-1">Real-time trading signals from financial sources</p>
           </div>
 
-          <div className="flex items-center mt-4 md:mt-0 gap-3">
+          <div className="flex flex-col md:flex-row items-start md:items-center mt-4 md:mt-0 gap-3">
             <div className="text-sm text-slate-500 flex items-center">
               <div className={`w-2 h-2 rounded-full mr-2 ${loading ? "bg-green-500 animate-pulse" : "bg-slate-400"}`}></div>
               {loading ? "Updating..." : `Last updated: ${lastUpdated}`}
             </div>
-            <button 
+            <button
               onClick={fetchSignals}
               disabled={loading}
               className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded text-sm font-medium flex items-center disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -64,6 +91,19 @@ export default function Home() {
               </svg>
               Refresh
             </button>
+              {user && (
+                <div className="flex flex-col items-end text-right">
+                  <p className="text-sm text-slate-600 dark:text-slate-300">
+                    Welcome, <span className="font-medium">{user.email}</span>
+                  </p>
+                  <button
+                    onClick={handleLogout}
+                    className="text-red-600 hover:underline text-sm font-medium mt-1"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
           </div>
         </div>
 
