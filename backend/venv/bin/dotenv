@@ -1,4 +1,4 @@
-#!/Users/rithvikdirisala/Desktop/proj/realtime-news-signal-generator/backend/venv/bin/python3
+#!/Users/ridhimamorampudi/realtime-news-signal-generator/backend/venv/bin/python3.13
 # -*- coding: utf-8 -*-
 import re
 import sys
