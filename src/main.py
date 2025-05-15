@@ -16,10 +16,12 @@ def process_articles(articles, source_name):
         text = (article.get("title", "") or "") + " " + (article.get("abstract", "") or "") + " " + (article.get("summary", "") or "")
         
         detected_events = detect_events_in_text(text)
+        named_entities = detect_entities(text)
         
         if is_market_moving(detected_events):
             print(f"🚨 [SIGNAL] [{source_name.upper()}] {article.get('title')}")
             print(f"Detected events: {detected_events}")
+            print(f"Entities: {named_entities}")
             print(f"Link: {article.get('url') or article.get('link')}\n")
 
 def run_full_cycle():
