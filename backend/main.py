@@ -14,6 +14,12 @@ from fetchers.sec_fetcher import fetch_sec_8k_filings
 from processing.nlp_processor import detect_events_in_text
 from signals.signal_generator import is_market_moving
 
+
+from utils.firestore_client import init_firestore, save_signal_to_firestore
+from utils.price_fetcher import get_current_price
+from utils.ticker_mapper import extract_ticker_from_text
+
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -31,6 +37,7 @@ async def root():
 @app.get("/fetch-signals")
 async def fetch_signals():
     signals = []
+    db = init_firestore()
 
     nyt_articles = fetch_nyt_finance_articles()
     yahoo_articles = fetch_yahoo_finance_articles()
@@ -42,7 +49,7 @@ async def fetch_signals():
             detected_events = detect_events_in_text(text)
             
             if is_market_moving(detected_events):
-                ticker = extract_ticker_from_title(article.get("title", ""))
+                ticker = extract_ticker_from_text(text)
                 suggestion = suggest_action(detected_events)
                 
                 signal = {
@@ -52,8 +59,13 @@ async def fetch_signals():
                     "ticker": ticker,
                     "suggestion": suggestion,
                     "link": article.get("url") or article.get("link"),
+                    
                 }
+                price = get_current_price(ticker)
+                if price is not None:
+                    signal["price_at_signal"] = price
                 signals.append(signal)
+                save_signal_to_firestore(db, signal)
 
     return {"signals": signals}
 

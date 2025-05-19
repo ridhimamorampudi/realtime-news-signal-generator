@@ -1,9 +1,9 @@
 # src/main.py
 
 import time
-from fetchers.nyt_fetcher import fetch_nyt_finance_articles
-from fetchers.yahoo_fetcher import fetch_yahoo_finance_articles
-from fetchers.sec_fetcher import fetch_sec_8k_filings
+from src.fetchers.nyt_fetcher import fetch_nyt_finance_articles
+from src.fetchers.yahoo_fetcher import fetch_yahoo_finance_articles
+from src.fetchers.sec_fetcher import fetch_sec_8k_filings
 
 from processing.nlp_processor import detect_events_in_text
 from signals.signal_generator import is_market_moving
